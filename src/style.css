@@ -31,6 +31,22 @@ h1 {
   letter-spacing: 0;
 }
 
+.connect-button {
+  margin: 0 0 20px;
+  padding: 11px 18px;
+  border: 1px solid #146381;
+  border-radius: 6px;
+  background: #146381;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.connect-button:hover {
+  background: #0e526d;
+}
+
 .status {
   max-width: 520px;
   margin: 0;

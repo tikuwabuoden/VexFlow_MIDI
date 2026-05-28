@@ -12,17 +12,23 @@ app.innerHTML = `
     <h1>MIDI 入力表示</h1>
     <button class="connect-button" type="button">MIDI に接続</button>
     <p class="status" data-state="idle">アプリケーションの準備ができました。</p>
+    <section class="device-panel" aria-label="MIDI 入力デバイス">
+      <h2>入力デバイス</h2>
+      <p class="device-list">未確認</p>
+    </section>
   </main>
 `;
 
 const connectButton = document.querySelector<HTMLButtonElement>(".connect-button");
 const status = document.querySelector<HTMLParagraphElement>(".status");
+const deviceList = document.querySelector<HTMLParagraphElement>(".device-list");
 
-if (!connectButton || !status) {
+if (!connectButton || !status || !deviceList) {
   throw new Error("MIDI connection controls were not found.");
 }
 
 const statusElement = status;
+const deviceListElement = deviceList;
 
 connectButton.addEventListener("click", async () => {
   if (!("requestMIDIAccess" in navigator)) {
@@ -34,10 +40,12 @@ connectButton.addEventListener("click", async () => {
   showStatus("MIDI の利用許可を確認しています。", "idle");
 
   try {
-    await navigator.requestMIDIAccess();
+    const midiAccess = await navigator.requestMIDIAccess();
     showStatus("MIDI を利用できます。", "success");
+    showInputDevices(midiAccess);
   } catch {
     showStatus("MIDI の利用が許可されませんでした。", "error");
+    showDeviceList("未確認");
   } finally {
     connectButton.disabled = false;
   }
@@ -46,4 +54,17 @@ connectButton.addEventListener("click", async () => {
 function showStatus(message: string, state: "idle" | "success" | "error"): void {
   statusElement.textContent = message;
   statusElement.dataset.state = state;
+}
+
+function showInputDevices(midiAccess: MIDIAccess): void {
+  const inputNames: string[] = [];
+  midiAccess.inputs.forEach((input) => {
+    inputNames.push(input.name ?? "名称不明のデバイス");
+  });
+
+  showDeviceList(inputNames.length > 0 ? inputNames.join(", ") : "入力デバイスは検出されませんでした。");
+}
+
+function showDeviceList(message: string): void {
+  deviceListElement.textContent = message;
 }

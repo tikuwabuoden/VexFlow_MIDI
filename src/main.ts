@@ -16,19 +16,27 @@ app.innerHTML = `
       <h2>入力デバイス</h2>
       <p class="device-list">未確認</p>
     </section>
+    <section class="test-panel" aria-label="テスト入力">
+      <h2>テスト入力</h2>
+      <button class="test-input-button" type="button">C4 を入力</button>
+      <p class="test-input-result">未入力</p>
+    </section>
   </main>
 `;
 
 const connectButton = document.querySelector<HTMLButtonElement>(".connect-button");
 const status = document.querySelector<HTMLParagraphElement>(".status");
 const deviceList = document.querySelector<HTMLParagraphElement>(".device-list");
+const testInputButton = document.querySelector<HTMLButtonElement>(".test-input-button");
+const testInputResult = document.querySelector<HTMLParagraphElement>(".test-input-result");
 
-if (!connectButton || !status || !deviceList) {
+if (!connectButton || !status || !deviceList || !testInputButton || !testInputResult) {
   throw new Error("MIDI connection controls were not found.");
 }
 
 const statusElement = status;
 const deviceListElement = deviceList;
+const testInputResultElement = testInputResult;
 
 connectButton.addEventListener("click", async () => {
   if (!("requestMIDIAccess" in navigator)) {
@@ -49,6 +57,10 @@ connectButton.addEventListener("click", async () => {
   } finally {
     connectButton.disabled = false;
   }
+});
+
+testInputButton.addEventListener("click", () => {
+  testInputResultElement.textContent = "C4 / MIDI 60 / velocity 100";
 });
 
 function showStatus(message: string, state: "idle" | "success" | "error"): void {

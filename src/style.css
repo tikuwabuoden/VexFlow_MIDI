@@ -72,23 +72,41 @@ h1 {
   color: #af3036;
 }
 
-.device-panel {
+.device-panel,
+.test-panel {
   max-width: 520px;
   margin-top: 20px;
 }
 
-.device-panel h2 {
+.device-panel h2,
+.test-panel h2 {
   margin: 0 0 8px;
   font-size: 16px;
   font-weight: 600;
   letter-spacing: 0;
 }
 
-.device-list {
+.device-list,
+.test-input-result {
   margin: 0;
   padding: 14px 16px;
   border: 1px solid #d0dade;
   border-radius: 6px;
   background: #ffffff;
   color: #435762;
+}
+
+.test-input-button {
+  margin: 0 0 12px;
+  padding: 9px 14px;
+  border: 1px solid #7b8790;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #1a2731;
+  font: inherit;
+  cursor: pointer;
+}
+
+.test-input-button:hover {
+  background: #eef3f5;
 }

@@ -19,6 +19,7 @@ app.innerHTML =/* html */ `
     <section class="message-panel" aria-label="MIDI メッセージ">
       <h2>最新 MIDI メッセージ</h2>
       <p class="message-data">未受信</p>
+      <p class="message-detail">未解析</p>
     </section>
     <section class="test-panel" aria-label="テスト入力">
       <h2>テスト入力</h2>
@@ -32,16 +33,18 @@ const connectButton = document.querySelector<HTMLButtonElement>(".connect-button
 const status = document.querySelector<HTMLParagraphElement>(".status");
 const deviceList = document.querySelector<HTMLParagraphElement>(".device-list");
 const messageData = document.querySelector<HTMLParagraphElement>(".message-data");
+const messageDetail = document.querySelector<HTMLParagraphElement>(".message-detail");
 const testInputButton = document.querySelector<HTMLButtonElement>(".test-input-button");
 const testInputResult = document.querySelector<HTMLParagraphElement>(".test-input-result");
 
-if (!connectButton || !status || !deviceList || !messageData || !testInputButton || !testInputResult) {
+if (!connectButton || !status || !deviceList || !messageData || !messageDetail || !testInputButton || !testInputResult) {
   throw new Error("MIDI connection controls were not found.");
 }
 
 const statusElement = status;
 const deviceListElement = deviceList;
 const messageDataElement = messageData;
+const messageDetailElement = messageDetail;
 const testInputResultElement = testInputResult;
 
 connectButton.addEventListener("click", async () => {
@@ -97,8 +100,31 @@ function listenToInputMessages(midiAccess: MIDIAccess): void {
 function showRawMidiMessage(event: MIDIMessageEvent): void {
   if (!event.data) {
     messageDataElement.textContent = "データなし";
+    messageDetailElement.textContent = "未解析";
     return;
   }
 
-  messageDataElement.textContent = Array.from(event.data).join(", ");
+  const data = Array.from(event.data);
+  messageDataElement.textContent = data.join(", ");
+  messageDetailElement.textContent = parseNoteMessage(data);
+}
+
+function parseNoteMessage(data: number[]): string {
+  if (data.length < 3) {
+    return "解析対象外";
+  }
+
+  const command = data[0] & 0xf0;
+  const noteNumber = data[1];
+  const velocity = data[2];
+
+  if (command === 0x90 && velocity > 0) {
+    return `note on / MIDI ${noteNumber} / velocity ${velocity}`;
+  }
+
+  if (command === 0x80 || (command === 0x90 && velocity === 0)) {
+    return `note off / MIDI ${noteNumber} / velocity ${velocity}`;
+  }
+
+  return "note on/off 以外";
 }

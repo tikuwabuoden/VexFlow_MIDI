@@ -90,6 +90,7 @@ h1 {
 
 .device-list,
 .message-data,
+.message-detail,
 .test-input-result {
   margin: 0;
   padding: 14px 16px;
@@ -97,6 +98,10 @@ h1 {
   border-radius: 6px;
   background: #ffffff;
   color: #435762;
+}
+
+.message-detail {
+  margin-top: 10px;
 }
 
 .test-input-button {

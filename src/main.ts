@@ -1,4 +1,5 @@
 import "./style.css";
+import { midiNoteToName } from "./note";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 
@@ -116,14 +117,15 @@ function parseNoteMessage(data: number[]): string {
 
   const command = data[0] & 0xf0;
   const noteNumber = data[1];
+  const noteName = midiNoteToName(noteNumber);
   const velocity = data[2];
 
   if (command === 0x90 && velocity > 0) {
-    return `note on / MIDI ${noteNumber} / velocity ${velocity}`;
+    return `note on / ${noteName} / MIDI ${noteNumber} / velocity ${velocity}`;
   }
 
   if (command === 0x80 || (command === 0x90 && velocity === 0)) {
-    return `note off / MIDI ${noteNumber} / velocity ${velocity}`;
+    return `note off / ${noteName} / MIDI ${noteNumber} / velocity ${velocity}`;
   }
 
   return "note on/off 以外";

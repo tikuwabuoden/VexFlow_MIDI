@@ -73,12 +73,14 @@ h1 {
 }
 
 .device-panel,
+.message-panel,
 .test-panel {
   max-width: 520px;
   margin-top: 20px;
 }
 
 .device-panel h2,
+.message-panel h2,
 .test-panel h2 {
   margin: 0 0 8px;
   font-size: 16px;
@@ -87,6 +89,7 @@ h1 {
 }
 
 .device-list,
+.message-data,
 .test-input-result {
   margin: 0;
   padding: 14px 16px;

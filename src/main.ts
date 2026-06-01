@@ -6,7 +6,7 @@ if (!app) {
   throw new Error("Application root was not found.");
 }
 
-app.innerHTML = `
+app.innerHTML =/* html */ `
   <main class="app">
     <p class="label">VexFlow MIDI Realtime Prototype</p>
     <h1>MIDI 入力表示</h1>

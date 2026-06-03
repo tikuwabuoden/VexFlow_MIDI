@@ -1,25 +1,26 @@
-import { Factory } from "vexflow";
+import { Formatter, Renderer, Stave, StaveNote, Voice } from "vexflow";
 
-export function renderFixedNotation(container: HTMLElement): void {
+export function renderFixedNotation(container: HTMLDivElement): void {
   container.replaceChildren();
 
-  const factory = new Factory({
-    renderer: {
-      elementId: container.id,
-      width: 500,
-      height: 180,
-    },
-  });
+  const renderer = new Renderer(container, Renderer.Backends.SVG);
+  renderer.resize(500, 180);
 
-  const score = factory.EasyScore();
-  const system = factory.System();
+  const context = renderer.getContext();
+  const stave = new Stave(10, 30, 460);
+  stave.addClef("treble");
+  stave.setContext(context).draw();
 
-  system
-    .addStave({
-      voices: [score.voice(score.notes("C4/q"))],
-    })
-    .addClef("treble")
-    .addTimeSignature("4/4");
+  const notes = [
+    new StaveNote({
+      keys: ["c/4"],
+      duration: "q",
+    }),
+  ];
 
-  factory.draw();
+  const voice = new Voice({ numBeats: 1, beatValue: 4 });
+  voice.addTickables(notes);
+
+  new Formatter().joinVoices([voice]).format([voice], 360);
+  voice.draw(context, stave);
 }

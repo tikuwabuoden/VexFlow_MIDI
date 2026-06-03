@@ -1,9 +1,11 @@
 import "./style.css";
 import { midiNoteToName } from "./note";
-import { renderFixedNotation } from "./notation";
+import { renderNotation } from "./notation";
 
 const MAX_LOG_ITEMS = 10;
+const MAX_NOTATION_NOTES = 4;
 const inputLog: string[] = [];
+const notationNotes = ["C4"];
 const TEST_NOTES = [
   { name: "C4", midi: 60 },
   { name: "D4", midi: 62 },
@@ -112,12 +114,13 @@ testInputButtons.forEach((button) => {
     const midiNumber = button.dataset.midi ?? "60";
     const message = `note on / ${noteName} / MIDI ${midiNumber} / velocity 100`;
     testInputResultElement.textContent = message;
+    addNotationNote(noteName);
     addInputLog(message);
   });
 });
 
 try {
-  renderFixedNotation(notationOutputElement);
+  renderNotation(notationOutputElement, notationNotes);
 } catch {
   notationOutputElement.textContent = "楽譜を描画できませんでした。";
 }
@@ -188,6 +191,16 @@ function addInputLog(message: string): void {
   inputLog.unshift(message);
   inputLog.splice(MAX_LOG_ITEMS);
   renderInputLog();
+}
+
+function addNotationNote(noteName: string): void {
+  notationNotes.push(noteName);
+  notationNotes.splice(0, Math.max(0, notationNotes.length - MAX_NOTATION_NOTES));
+  try {
+    renderNotation(notationOutputElement, notationNotes);
+  } catch {
+    notationOutputElement.textContent = "楽譜を描画できませんでした。";
+  }
 }
 
 function renderInputLog(): void {

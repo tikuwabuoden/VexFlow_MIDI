@@ -1,6 +1,6 @@
 import { Formatter, Renderer, Stave, StaveNote, Voice } from "vexflow";
 
-export function renderFixedNotation(container: HTMLDivElement): void {
+export function renderNotation(container: HTMLDivElement, noteNames: string[]): void {
   container.replaceChildren();
 
   const renderer = new Renderer(container, Renderer.Backends.SVG);
@@ -11,16 +11,27 @@ export function renderFixedNotation(container: HTMLDivElement): void {
   stave.addClef("treble");
   stave.setContext(context).draw();
 
-  const notes = [
-    new StaveNote({
-      keys: ["c/4"],
-      duration: "q",
-    }),
-  ];
+  const notes = noteNames.map(
+    (noteName) =>
+      new StaveNote({
+        keys: [noteNameToVexFlowKey(noteName)],
+        duration: "q",
+      }),
+  );
 
-  const voice = new Voice({ numBeats: 1, beatValue: 4 });
+  const voice = new Voice({ numBeats: notes.length, beatValue: 4 });
   voice.addTickables(notes);
 
   new Formatter().joinVoices([voice]).format([voice], 360);
   voice.draw(context, stave);
+}
+
+function noteNameToVexFlowKey(noteName: string): string {
+  const match = noteName.match(/^([A-G]#?)(-?\d+)$/);
+
+  if (!match) {
+    return "c/4";
+  }
+
+  return `${match[1].toLowerCase()}/${match[2]}`;
 }

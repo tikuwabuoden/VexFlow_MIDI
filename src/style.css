@@ -108,6 +108,13 @@ h1 {
   margin-top: 10px;
 }
 
+.test-input-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
 .test-input-button {
   margin: 0 0 12px;
   padding: 9px 14px;
@@ -117,6 +124,10 @@ h1 {
   color: #1a2731;
   font: inherit;
   cursor: pointer;
+}
+
+.test-input-buttons .test-input-button {
+  margin: 0;
 }
 
 .test-input-button:hover {

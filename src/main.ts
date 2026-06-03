@@ -4,6 +4,12 @@ import { renderFixedNotation } from "./notation";
 
 const MAX_LOG_ITEMS = 10;
 const inputLog: string[] = [];
+const TEST_NOTES = [
+  { name: "C4", midi: 60 },
+  { name: "D4", midi: 62 },
+  { name: "E4", midi: 64 },
+  { name: "G4", midi: 67 },
+];
 
 const app = document.querySelector<HTMLDivElement>("#app");
 
@@ -28,7 +34,9 @@ app.innerHTML =/* html */ `
     </section>
     <section class="test-panel" aria-label="テスト入力">
       <h2>テスト入力</h2>
-      <button class="test-input-button" type="button">C4 を入力</button>
+      <div class="test-input-buttons">
+        ${TEST_NOTES.map((note) => `<button class="test-input-button" type="button" data-note="${note.name}" data-midi="${note.midi}">${note.name} を入力</button>`).join("")}
+      </div>
       <p class="test-input-result">未入力</p>
     </section>
     <section class="notation-panel" aria-label="楽譜表示">
@@ -49,7 +57,7 @@ const status = document.querySelector<HTMLParagraphElement>(".status");
 const deviceList = document.querySelector<HTMLParagraphElement>(".device-list");
 const messageData = document.querySelector<HTMLParagraphElement>(".message-data");
 const messageDetail = document.querySelector<HTMLParagraphElement>(".message-detail");
-const testInputButton = document.querySelector<HTMLButtonElement>(".test-input-button");
+const testInputButtons = document.querySelectorAll<HTMLButtonElement>(".test-input-button");
 const testInputResult = document.querySelector<HTMLParagraphElement>(".test-input-result");
 const notationOutput = document.querySelector<HTMLDivElement>("#notation-output");
 const inputLogList = document.querySelector<HTMLOListElement>(".input-log");
@@ -60,7 +68,7 @@ if (
   !deviceList ||
   !messageData ||
   !messageDetail ||
-  !testInputButton ||
+  testInputButtons.length === 0 ||
   !testInputResult ||
   !notationOutput ||
   !inputLogList
@@ -98,10 +106,14 @@ connectButton.addEventListener("click", async () => {
   }
 });
 
-testInputButton.addEventListener("click", () => {
-  const message = "note on / C4 / MIDI 60 / velocity 100";
-  testInputResultElement.textContent = message;
-  addInputLog(message);
+testInputButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const noteName = button.dataset.note ?? "C4";
+    const midiNumber = button.dataset.midi ?? "60";
+    const message = `note on / ${noteName} / MIDI ${midiNumber} / velocity 100`;
+    testInputResultElement.textContent = message;
+    addInputLog(message);
+  });
 });
 
 try {

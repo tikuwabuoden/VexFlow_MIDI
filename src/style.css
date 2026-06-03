@@ -75,6 +75,7 @@ h1 {
 .device-panel,
 .message-panel,
 .test-panel,
+.notation-panel,
 .log-panel {
   max-width: 520px;
   margin-top: 20px;
@@ -83,6 +84,7 @@ h1 {
 .device-panel h2,
 .message-panel h2,
 .test-panel h2,
+.notation-panel h2,
 .log-panel h2 {
   margin: 0 0 8px;
   font-size: 16px;
@@ -119,6 +121,14 @@ h1 {
 
 .test-input-button:hover {
   background: #eef3f5;
+}
+
+.notation-output {
+  min-height: 180px;
+  overflow-x: auto;
+  border: 1px solid #d0dade;
+  border-radius: 6px;
+  background: #ffffff;
 }
 
 .input-log {

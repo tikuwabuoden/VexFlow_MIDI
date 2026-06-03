@@ -1,5 +1,6 @@
 import "./style.css";
 import { midiNoteToName } from "./note";
+import { renderFixedNotation } from "./notation";
 
 const MAX_LOG_ITEMS = 10;
 const inputLog: string[] = [];
@@ -30,6 +31,10 @@ app.innerHTML =/* html */ `
       <button class="test-input-button" type="button">C4 を入力</button>
       <p class="test-input-result">未入力</p>
     </section>
+    <section class="notation-panel" aria-label="楽譜表示">
+      <h2>楽譜表示</h2>
+      <div id="notation-output" class="notation-output"></div>
+    </section>
     <section class="log-panel" aria-label="入力ログ">
       <h2>入力ログ</h2>
       <ol class="input-log">
@@ -46,6 +51,7 @@ const messageData = document.querySelector<HTMLParagraphElement>(".message-data"
 const messageDetail = document.querySelector<HTMLParagraphElement>(".message-detail");
 const testInputButton = document.querySelector<HTMLButtonElement>(".test-input-button");
 const testInputResult = document.querySelector<HTMLParagraphElement>(".test-input-result");
+const notationOutput = document.querySelector<HTMLDivElement>("#notation-output");
 const inputLogList = document.querySelector<HTMLOListElement>(".input-log");
 
 if (
@@ -56,6 +62,7 @@ if (
   !messageDetail ||
   !testInputButton ||
   !testInputResult ||
+  !notationOutput ||
   !inputLogList
 ) {
   throw new Error("MIDI connection controls were not found.");
@@ -66,6 +73,7 @@ const deviceListElement = deviceList;
 const messageDataElement = messageData;
 const messageDetailElement = messageDetail;
 const testInputResultElement = testInputResult;
+const notationOutputElement = notationOutput;
 const inputLogListElement = inputLogList;
 
 connectButton.addEventListener("click", async () => {
@@ -95,6 +103,12 @@ testInputButton.addEventListener("click", () => {
   testInputResultElement.textContent = message;
   addInputLog(message);
 });
+
+try {
+  renderFixedNotation(notationOutputElement);
+} catch {
+  notationOutputElement.textContent = "楽譜を描画できませんでした。";
+}
 
 function showStatus(message: string, state: "idle" | "success" | "error"): void {
   statusElement.textContent = message;

@@ -1,6 +1,9 @@
 import "./style.css";
 import { midiNoteToName } from "./note";
 
+const MAX_LOG_ITEMS = 10;
+const inputLog: string[] = [];
+
 const app = document.querySelector<HTMLDivElement>("#app");
 
 if (!app) {
@@ -27,6 +30,12 @@ app.innerHTML =/* html */ `
       <button class="test-input-button" type="button">C4 を入力</button>
       <p class="test-input-result">未入力</p>
     </section>
+    <section class="log-panel" aria-label="入力ログ">
+      <h2>入力ログ</h2>
+      <ol class="input-log">
+        <li>未入力</li>
+      </ol>
+    </section>
   </main>
 `;
 
@@ -37,8 +46,18 @@ const messageData = document.querySelector<HTMLParagraphElement>(".message-data"
 const messageDetail = document.querySelector<HTMLParagraphElement>(".message-detail");
 const testInputButton = document.querySelector<HTMLButtonElement>(".test-input-button");
 const testInputResult = document.querySelector<HTMLParagraphElement>(".test-input-result");
+const inputLogList = document.querySelector<HTMLOListElement>(".input-log");
 
-if (!connectButton || !status || !deviceList || !messageData || !messageDetail || !testInputButton || !testInputResult) {
+if (
+  !connectButton ||
+  !status ||
+  !deviceList ||
+  !messageData ||
+  !messageDetail ||
+  !testInputButton ||
+  !testInputResult ||
+  !inputLogList
+) {
   throw new Error("MIDI connection controls were not found.");
 }
 
@@ -47,6 +66,7 @@ const deviceListElement = deviceList;
 const messageDataElement = messageData;
 const messageDetailElement = messageDetail;
 const testInputResultElement = testInputResult;
+const inputLogListElement = inputLogList;
 
 connectButton.addEventListener("click", async () => {
   if (!("requestMIDIAccess" in navigator)) {
@@ -71,7 +91,9 @@ connectButton.addEventListener("click", async () => {
 });
 
 testInputButton.addEventListener("click", () => {
-  testInputResultElement.textContent = "C4 / MIDI 60 / velocity 100";
+  const message = "note on / C4 / MIDI 60 / velocity 100";
+  testInputResultElement.textContent = message;
+  addInputLog(message);
 });
 
 function showStatus(message: string, state: "idle" | "success" | "error"): void {
@@ -107,12 +129,17 @@ function showRawMidiMessage(event: MIDIMessageEvent): void {
 
   const data = Array.from(event.data);
   messageDataElement.textContent = data.join(", ");
-  messageDetailElement.textContent = parseNoteMessage(data);
+  const noteMessage = parseNoteMessage(data);
+  messageDetailElement.textContent = noteMessage ?? "note on/off 以外";
+
+  if (noteMessage) {
+    addInputLog(noteMessage);
+  }
 }
 
-function parseNoteMessage(data: number[]): string {
+function parseNoteMessage(data: number[]): string | null {
   if (data.length < 3) {
-    return "解析対象外";
+    return null;
   }
 
   const command = data[0] & 0xf0;
@@ -128,5 +155,22 @@ function parseNoteMessage(data: number[]): string {
     return `note off / ${noteName} / MIDI ${noteNumber} / velocity ${velocity}`;
   }
 
-  return "note on/off 以外";
+  return null;
+}
+
+function addInputLog(message: string): void {
+  inputLog.unshift(message);
+  inputLog.splice(MAX_LOG_ITEMS);
+  renderInputLog();
+}
+
+function renderInputLog(): void {
+  inputLogListElement.replaceChildren(...inputLog.map(createInputLogItem));
+}
+
+function createInputLogItem(message: string): HTMLLIElement {
+  const item = document.createElement("li");
+  item.textContent = message;
+
+  return item;
 }

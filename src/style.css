@@ -74,14 +74,16 @@ h1 {
 
 .device-panel,
 .message-panel,
-.test-panel {
+.test-panel,
+.log-panel {
   max-width: 520px;
   margin-top: 20px;
 }
 
 .device-panel h2,
 .message-panel h2,
-.test-panel h2 {
+.test-panel h2,
+.log-panel h2 {
   margin: 0 0 8px;
   font-size: 16px;
   font-weight: 600;
@@ -117,4 +119,31 @@ h1 {
 
 .test-input-button:hover {
   background: #eef3f5;
+}
+
+.input-log {
+  margin: 0;
+  padding: 0;
+  list-style-position: inside;
+}
+
+.input-log li {
+  padding: 12px 16px;
+  border: 1px solid #d0dade;
+  border-bottom-width: 0;
+  background: #ffffff;
+  color: #435762;
+}
+
+.input-log li:first-child {
+  border-radius: 6px 6px 0 0;
+}
+
+.input-log li:last-child {
+  border-bottom-width: 1px;
+  border-radius: 0 0 6px 6px;
+}
+
+.input-log li:only-child {
+  border-radius: 6px;
 }

@@ -13,6 +13,12 @@ const TEST_NOTES = [
   { name: "G4", midi: 67 },
 ];
 
+interface ParsedNoteMessage {
+  type: "note-on" | "note-off";
+  noteName: string;
+  message: string;
+}
+
 const app = document.querySelector<HTMLDivElement>("#app");
 
 if (!app) {
@@ -158,15 +164,19 @@ function showRawMidiMessage(event: MIDIMessageEvent): void {
 
   const data = Array.from(event.data);
   messageDataElement.textContent = data.join(", ");
-  const noteMessage = parseNoteMessage(data);
-  messageDetailElement.textContent = noteMessage ?? "note on/off 以外";
+  const parsedMessage = parseNoteMessage(data);
+  messageDetailElement.textContent = parsedMessage?.message ?? "note on/off 以外";
 
-  if (noteMessage) {
-    addInputLog(noteMessage);
+  if (parsedMessage) {
+    addInputLog(parsedMessage.message);
+
+    if (parsedMessage.type === "note-on") {
+      addNotationNote(parsedMessage.noteName);
+    }
   }
 }
 
-function parseNoteMessage(data: number[]): string | null {
+function parseNoteMessage(data: number[]): ParsedNoteMessage | null {
   if (data.length < 3) {
     return null;
   }
@@ -177,11 +187,19 @@ function parseNoteMessage(data: number[]): string | null {
   const velocity = data[2];
 
   if (command === 0x90 && velocity > 0) {
-    return `note on / ${noteName} / MIDI ${noteNumber} / velocity ${velocity}`;
+    return {
+      type: "note-on",
+      noteName,
+      message: `note on / ${noteName} / MIDI ${noteNumber} / velocity ${velocity}`,
+    };
   }
 
   if (command === 0x80 || (command === 0x90 && velocity === 0)) {
-    return `note off / ${noteName} / MIDI ${noteNumber} / velocity ${velocity}`;
+    return {
+      type: "note-off",
+      noteName,
+      message: `note off / ${noteName} / MIDI ${noteNumber} / velocity ${velocity}`,
+    };
   }
 
   return null;

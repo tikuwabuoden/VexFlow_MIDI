@@ -50,6 +50,7 @@ app.innerHTML =/* html */ `
     <section class="notation-panel" aria-label="楽譜表示">
       <h2>楽譜表示</h2>
       <div id="notation-output" class="notation-output"></div>
+      <p class="render-latency">入力から描画まで: 未計測</p>
     </section>
     <section class="log-panel" aria-label="入力ログ">
       <h2>入力ログ</h2>
@@ -68,6 +69,7 @@ const messageDetail = document.querySelector<HTMLParagraphElement>(".message-det
 const testInputButtons = document.querySelectorAll<HTMLButtonElement>(".test-input-button");
 const testInputResult = document.querySelector<HTMLParagraphElement>(".test-input-result");
 const notationOutput = document.querySelector<HTMLDivElement>("#notation-output");
+const renderLatency = document.querySelector<HTMLParagraphElement>(".render-latency");
 const inputLogList = document.querySelector<HTMLOListElement>(".input-log");
 
 if (
@@ -79,6 +81,7 @@ if (
   testInputButtons.length === 0 ||
   !testInputResult ||
   !notationOutput ||
+  !renderLatency ||
   !inputLogList
 ) {
   throw new Error("MIDI connection controls were not found.");
@@ -90,6 +93,7 @@ const messageDataElement = messageData;
 const messageDetailElement = messageDetail;
 const testInputResultElement = testInputResult;
 const notationOutputElement = notationOutput;
+const renderLatencyElement = renderLatency;
 const inputLogListElement = inputLogList;
 
 connectButton.addEventListener("click", async () => {
@@ -156,6 +160,8 @@ function listenToInputMessages(midiAccess: MIDIAccess): void {
 }
 
 function showRawMidiMessage(event: MIDIMessageEvent): void {
+  const receivedAt = performance.now();
+
   if (!event.data) {
     messageDataElement.textContent = "データなし";
     messageDetailElement.textContent = "未解析";
@@ -172,6 +178,7 @@ function showRawMidiMessage(event: MIDIMessageEvent): void {
 
     if (parsedMessage.type === "note-on") {
       addNotationNote(parsedMessage.noteName);
+      showRenderLatency(performance.now() - receivedAt);
     }
   }
 }
@@ -219,6 +226,10 @@ function addNotationNote(noteName: string): void {
   } catch {
     notationOutputElement.textContent = "楽譜を描画できませんでした。";
   }
+}
+
+function showRenderLatency(latency: number): void {
+  renderLatencyElement.textContent = `入力から描画まで: ${latency.toFixed(2)} ms`;
 }
 
 function renderInputLog(): void {

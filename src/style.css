@@ -142,6 +142,13 @@ h1 {
   background: #ffffff;
 }
 
+.render-latency {
+  margin: 8px 0 0;
+  color: #536873;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
 .input-log {
   margin: 0;
   padding: 0;
